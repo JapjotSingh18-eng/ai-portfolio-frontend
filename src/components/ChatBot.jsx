@@ -1,120 +1,48 @@
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { MessageCircle, X } from "lucide-react";
+import React, { useState } from 'react';
 
-import ChatWindow from "./ChatWindow";
+// Ensure Vite reads the base URL correctly
+const API_URL = import.meta.env.VITE_API_URL || "https://ai-portfolio-backend-8.onrender.com";
 
+export default function Chatbot() {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
-export default function ChatBot(){
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    if (!input.trim()) return;
 
-    const [open,setOpen] = useState(true);
+    const userMessage = { role: 'user', content: input };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setLoading(true);
 
+    try {
+      // EXACT ALIGNMENT: Appends /chat to the base domain, sends a POST request with JSON headers
+      const response = await fetch(`${API_URL}/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: userMessage.content }),
+      });
 
-    return(
-        <>
+      if (!response.ok) {
+        throw new Error(`Server returned status ${response.status}`);
+      }
 
-        {!open && (
+      const data = await response.json();
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply }]);
+    } catch (error) {
+      console.error("Connection Error:", error);
+      setMessages((prev) => [...prev, { role: 'assistant', content: "Unable to connect to the AI server. Please try again later." }]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            <motion.button
-
-                whileHover={{scale:1.1}}
-                whileTap={{scale:0.9}}
-
-                onClick={()=>setOpen(true)}
-
-                className="
-                fixed
-                bottom-8
-                right-8
-                z-50
-                h-16
-                w-16
-                rounded-full
-                bg-gradient-to-r
-                from-blue-600
-                to-cyan-400
-                shadow-2xl
-                flex
-                items-center
-                justify-center
-                "
-            >
-
-                <MessageCircle 
-                    size={32}
-                    className="text-white"
-                />
-
-            </motion.button>
-
-        )}
-
-
-
-        <AnimatePresence>
-
-        {
-            open && (
-
-                <motion.div
-
-                initial={{
-                    opacity:0,
-                    scale:0.8,
-                    y:50
-                }}
-
-                animate={{
-                    opacity:1,
-                    scale:1,
-                    y:0
-                }}
-
-                exit={{
-                    opacity:0,
-                    scale:0.8,
-                    y:50
-                }}
-
-                transition={{
-                    duration:0.3
-                }}
-
-
-                className="
-                fixed
-                bottom-6
-                right-6
-                z-50
-                w-[95vw]
-                sm:w-[430px]
-                h-[650px]
-                rounded-3xl
-                overflow-hidden
-                bg-slate-950/90
-                backdrop-blur-xl
-                border
-                border-white/10
-                shadow-2xl
-                "
-
-                >
-
-                   
-
-
-                    <ChatWindow/>
-
-
-                </motion.div>
-
-            )
-        }
-
-
-        </AnimatePresence>
-
-
-        </>
-    )
+  return (
+    // Your existing Chat UI JSX elements go here...
+    <div>Chat UI Wrapper</div>
+  );
 }
