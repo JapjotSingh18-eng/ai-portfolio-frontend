@@ -79,7 +79,7 @@ try{
 
 const response=await fetch(
 
-"https://ai-portfolio-backend-063l.onrender.com/",
+"https://ai-portfolio-backend-8.onrender.com/chat",
 
 {
 

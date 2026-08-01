@@ -1,24 +1,8 @@
-import ChatWindow from "./components/ChatWindow";
-
+import ChatBot from "./components/ChatBot";
 
 function App() {
-
-
-  return (
-
-    <div className="
-      h-screen
-      w-screen
-      bg-slate-950
-    ">
-
-      <ChatWindow />
-
-    </div>
-
-  );
-
+  return <ChatBot />;
 }
 
-
 export default App;
+
