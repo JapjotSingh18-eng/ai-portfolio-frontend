@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 
 // Ensure Vite reads the base URL correctly
-const API_URL = import.meta.env.VITE_API_URL || "https://ai-portfolio-backend-8.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL || "https://ai-portfolio-backend-11.onrender.com/";
 
 export default function Chatbot() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const bottomRef = useRef(null);
+
+useEffect(() => {
+  bottomRef.current?.scrollIntoView({
+    behavior: "smooth",
+  });
+}, [messages]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -18,32 +25,64 @@ export default function Chatbot() {
     setLoading(true);
 
     try {
-      // EXACT ALIGNMENT: Appends /chat to the base domain, sends a POST request with JSON headers
-      const response = await fetch(`${API_URL}/chat`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: userMessage.content }),
-      });
+  const response = await fetch(`${API_URL}/chat`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ message: userMessage.content }),
+  });
 
-      if (!response.ok) {
-        throw new Error(`Server returned status ${response.status}`);
-      }
+  if (!response.ok) {
+    throw new Error(`Server returned status ${response.status}`);
+  }
 
-      const data = await response.json();
-      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply }]);
-    } catch (error) {
-      console.error("Connection Error:", error);
-      setMessages((prev) => [...prev, { role: 'assistant', content: "Unable to connect to the AI server. Please try again later." }]);
-    } finally {
-      setLoading(false);
-    }
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+
+  // Create an empty assistant message first
+  setMessages((prev) => [
+    ...prev,
+    { role: "assistant", content: "" },
+  ]);
+
+  let fullResponse = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+
+    if (done) break;
+
+    const chunk = decoder.decode(value, { stream: true });
+
+    fullResponse += chunk;
+
+    setMessages((prev) => {
+      const updated = [...prev];
+      updated[updated.length - 1] = {
+        role: "assistant",
+        content: fullResponse,
+      };
+      return updated;
+    });
+  }
+} catch (error) {
+    console.error(error);
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "assistant",
+        content: "Unable to connect to the AI server.",
+      },
+    ]);
+  } finally {
+    setLoading(false);
+  }
   };
 
-  
-    return (
-  <div className="h-screen w-screen flex flex-col bg-slate-950 text-white">
+  return (
+    <div className="h-screen w-screen flex flex-col bg-slate-950 text-white">
 
     {/* Header */}
     <div className="bg-gradient-to-r from-blue-700 to-cyan-500 p-4 shadow-lg">
