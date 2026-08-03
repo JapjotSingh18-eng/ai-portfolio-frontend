@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 // Ensure Vite reads the base URL correctly
-const API_URL = import.meta.env.VITE_API_URL || "https://ai-portfolio-backend-11.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL || "https://ai-portfolio-backend-12.onrender.com";
 
 export default function Chatbot() {
   const [messages, setMessages] = useState([]);
