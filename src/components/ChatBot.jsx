@@ -43,7 +43,7 @@ export default function Chatbot() {
       });
 
       if (!response.ok) {
-        throw new Error(`Server returned status ${response.status}`);
+        throw new Error(`Server returned ${response.status}`);
       }
 
       const data = await response.json();
@@ -52,11 +52,7 @@ export default function Chatbot() {
         ...prev,
         {
           role: "assistant",
-          content:
-            data.response ||
-            data.reply ||
-            data.message ||
-            "No response received.",
+          content: data.response || "No response received.",
         },
       ]);
     } catch (error) {
@@ -83,35 +79,36 @@ export default function Chatbot() {
         <h1 className="text-2xl font-bold">
           🤖 Japjot AI Assistant
         </h1>
+
         <p className="text-sm opacity-80">
           AI Portfolio Assistant
         </p>
       </div>
 
-      {/* Chat Area */}
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-5 space-y-4">
 
         {messages.length === 0 && (
-          <div className="bg-slate-800 rounded-xl p-4 max-w-lg">
-            <h2 className="font-semibold text-lg mb-2">
+          <div className="bg-slate-800 rounded-xl p-4 max-w-xl">
+            <h2 className="text-lg font-semibold mb-2">
               👋 Welcome!
             </h2>
 
             <p>
-              I'm Japjot's AI Portfolio Assistant.
+              I'm Japjot Singh's AI Portfolio Assistant.
             </p>
 
-            <p className="mt-2">
-              Ask me about:
+            <p className="mt-3">
+              Try asking:
             </p>
 
             <ul className="list-disc ml-5 mt-2 space-y-1">
-              <li>Projects</li>
-              <li>Skills</li>
-              <li>Education</li>
-              <li>Experience</li>
-              <li>Resume</li>
-              <li>Career Goals</li>
+              <li>Tell me about yourself</li>
+              <li>Show me your projects</li>
+              <li>What are your skills?</li>
+              <li>What is your CGPA?</li>
+              <li>Give me your GitHub</li>
+              <li>Show your LinkedIn</li>
             </ul>
           </div>
         )}
@@ -126,7 +123,7 @@ export default function Chatbot() {
             }`}
           >
             <div
-              className={`max-w-[75%] rounded-2xl px-4 py-3 whitespace-pre-wrap ${
+              className={`max-w-[75%] px-4 py-3 rounded-2xl whitespace-pre-wrap ${
                 msg.role === "user"
                   ? "bg-blue-600"
                   : "bg-slate-800"
@@ -139,7 +136,7 @@ export default function Chatbot() {
 
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-slate-800 rounded-2xl px-4 py-3">
+            <div className="bg-slate-800 rounded-2xl px-4 py-3 animate-pulse">
               Thinking...
             </div>
           </div>
@@ -159,7 +156,7 @@ export default function Chatbot() {
           value={input}
           placeholder="Ask about my portfolio..."
           onChange={(e) => setInput(e.target.value)}
-          className="flex-1 rounded-xl bg-slate-800 p-3 outline-none"
+          className="flex-1 bg-slate-800 rounded-xl p-3 outline-none"
         />
 
         <button
